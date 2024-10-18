@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(uuid())
+  name     String
+  email    String
+  username String
+  password String
+  groupId  Int    @map("group_id")
+
+  lessonStudent LessonStudent[]
+  role          Role?
+  group         Group           @relation(fields: [groupId], references: [id])
+  lessons       Lesson[]
+
+  @@unique([email, username, groupId])
+  @@map("user")
+}
+
+model Lesson {
+  id         String @id @default(uuid())
+  locationId String @map("location_id")
+  groupId    Int    @map("group_id")
+  teacherId  String @map("teacher_id")
+
+  lessonStudent LessonStudent[]
+  group         Group           @relation(fields: [groupId], references: [id])
+  teacher       User            @relation(fields: [teacherId], references: [id])
+
+  @@map("lesson")
+}
+
+model LessonStudent {
+  id       String @id @default(uuid())
+  lessonId String @map("lesson_id")
+  userId   String @map("user_id")
+  groupId  Int    @map("group_id")
+
+  group     Group  @relation(fields: [groupId], references: [id])
+  lesson    Lesson @relation(fields: [lessonId], references: [id])
+  passenger User   @relation(fields: [userId], references: [id])
+
+  @@map("lesson_student")
+}
+
+model Group {
+  id              Int             @id
+  travelPassenger LessonStudent[]
+  travel          Lesson[]
+  user            User[]
+
+  @@map("group")
+}
+
+enum Role {
+  Teacher
+  Studend
+}
