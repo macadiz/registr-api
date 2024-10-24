@@ -26,7 +26,8 @@ model User {
   group         Group           @relation(fields: [groupId], references: [id])
   lessons       Lesson[]
 
-  @@unique([email, username, groupId])
+  @@unique([email, groupId])
+  @@unique([email, username])
   @@map("user")
 }
 
