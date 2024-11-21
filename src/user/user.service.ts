@@ -24,4 +24,8 @@ export class UserService {
       email,
     );
   }
+
+  async getUserById(userId: string, groupId: number) {
+    return this.userRepository.getUserById(userId, groupId);
+  }
 }

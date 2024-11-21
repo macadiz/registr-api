@@ -7,16 +7,22 @@ export class UserRepository {
   constructor(private prismaService: PrismaService) {}
 
   async validateUser(groupId: number, username: string, password: string) {
-    const user = await this.prismaService.user.findFirst({
-      where: {
-        username,
-        groupId,
-      },
-    });
+    try {
+      const user = await this.prismaService.user.findFirst({
+        where: {
+          username,
+          groupId,
+        },
+      });
 
-    const isValid = user ? await validateHash(password, user.password) : false;
+      const isValid = user
+        ? await validateHash(password, user.password)
+        : false;
 
-    return { isValid };
+      return { isValid, id: user?.id };
+    } catch (e) {
+      return { isValid: false, error: e.message };
+    }
   }
 
   async createUser(
@@ -33,6 +39,21 @@ export class UserRepository {
         password: await hashPassword(password),
         groupId,
         name,
+      },
+    });
+  }
+
+  async getUserById(userId: string, groupId: number) {
+    return this.prismaService.user.findFirst({
+      where: {
+        id: userId,
+        groupId,
+      },
+      select: {
+        email: true,
+        id: true,
+        name: true,
+        role: true,
       },
     });
   }

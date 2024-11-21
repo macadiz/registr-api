@@ -32,10 +32,10 @@ model User {
 }
 
 model Lesson {
-  id         String @id @default(uuid())
-  locationId String @map("location_id")
-  groupId    Int    @map("group_id")
-  teacherId  String @map("teacher_id")
+  id        String @id @default(uuid())
+  name      String
+  groupId   Int    @map("group_id")
+  teacherId String @map("teacher_id")
 
   lessonStudent LessonStudent[]
   group         Group           @relation(fields: [groupId], references: [id])
@@ -50,9 +50,9 @@ model LessonStudent {
   userId   String @map("user_id")
   groupId  Int    @map("group_id")
 
-  group     Group  @relation(fields: [groupId], references: [id])
-  lesson    Lesson @relation(fields: [lessonId], references: [id])
-  passenger User   @relation(fields: [userId], references: [id])
+  group   Group  @relation(fields: [groupId], references: [id])
+  lesson  Lesson @relation(fields: [lessonId], references: [id])
+  student User   @relation(fields: [userId], references: [id])
 
   @@map("lesson_student")
 }
@@ -68,5 +68,5 @@ model Group {
 
 enum Role {
   Teacher
-  Studend
+  Student
 }
